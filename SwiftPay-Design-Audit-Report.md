@@ -44,7 +44,7 @@ Raw exports of every audited frame are in [`screenshots/`](screenshots/). Annota
 | **9** | **The receipt and card text is too small to read.** On *Send Money 11* every line of the receipt (labels, values, reference, "Generated from…") is **8 px**. Labels are `#7D7C93` on white (**4.06:1**). On the balance card, "Last updated 2 mins ago." is **9 px**. | Accessibility | **Typography** guidance from the module calls for a readable minimum body size: Apple's Human Interface Guidelines set 11 pt as the smallest legible text, and 16 px is the common mobile body size. At 8 px, the transaction reference and amount, the details a user may need for a dispute, are unreadable for most users without zooming. At that size the labels also fail **SC 1.4.3** (4.06:1 < 4.5:1). If the receipt is generated as an image, users cannot enlarge the text with system font settings, which works against **SC 1.4.4 Resize Text**. Fix: at least 12–14 px on the receipt, labels `#6B6A80` (5.25:1), and a text-based (not image) receipt. |
 | **10** | **Icon-only buttons and images have no accessible names, and one icon's meaning is unclear.** The header controls are bare icons: back (`CaretLeft`), close (`X`), share (`Export`) and a **speech-bubble icon (`ChatDots`) on *Send Money 1* with no label**. The bank logos are layers with auto-generated names (`31a86295-f41b-…`, `f83ba6f8-060e-…`), and the eNaira logo is a raster image named `e-naira-logo 2`. The file contains **no accessibility annotations** (alt text or button labels) for any of them. | Accessibility | **WCAG SC 1.1.1 Non-text Content** requires a text alternative for meaningful images. **SC 4.1.2 Name, Role, Value** requires every control to have an accessible name. With "Shift Left", developers build what the design specifies. Without annotations, a screen reader will announce "button, unlabelled" or read a file name such as "e-naira-logo 2", so blind users cannot tell back from close or share. The `ChatDots` icon is ambiguous even for sighted users (chat? support? messages?), which goes against Nielsen's **Recognition rather than recall**. Fix: annotate accessible names ("Back", "Close", "Share receipt", "Contact support", "United Bank for Africa logo") and add a visible label or tooltip to the chat icon. |
 | **11** | **The balance is formatted incorrectly: `₦20,000,00.00`.** On *Send Money 2–6* and the eNaira screens, the digits are grouped as 2-3-2. Standard thousands grouping gives either `₦20,000,000.00` or `₦2,000,000.00`, so the actual amount is ambiguous. | UX | Nielsen's **Match between the system and the real world** says the interface should follow real-world conventions, and in finance the convention is strict 3-digit grouping. A balance that cannot be read with confidence breaks **user trust**, the most important quality of a payment app. The user also cannot judge whether they can afford the transfer, which weakens **error prevention**. Fix: format currency with a locale-aware formatter (`en-NG`, thousands separator every 3 digits). |
-| **12** | **The eNaira flow shows conflicting payee and transaction details.** The beneficiary's wallet alias is **`@adetor.1g`** on the confirmation and success screens (*eNaira 2, 4, 5, 10*) but **`@adetoro.1g`** on the receipt (*eNaira 11*). The receipt also labels this wallet transfer **"INTER-BANK"**, and the success screen says **"Bank Name: eNaira"**, although eNaira is a digital-currency wallet, not a bank. | UX | **Consistency and standards** (Nielsen) and **trust** require the same information to appear the same way at every step. If the alias changes between confirmation and receipt, the user cannot tell which account actually received the money, and a dispute becomes harder (also an **Error prevention** concern). Reusing bank-transfer wording for an eNaira transfer breaks **Match between the system and the real world**: the labels describe the wrong kind of transaction. Fix: render all payee details from one source, and use eNaira-specific labels ("Wallet: eNaira", type "eNaira transfer"). |
+| **12** | **The eNaira flow shows conflicting payee and transaction details.** The beneficiary's wallet alias is **`@adetor.1g`** on the confirmation and success screens (*eNaira 2, 4 and 10*) but **`@adetoro.1g`** on the receipt (*eNaira 11*). The receipt also labels this wallet transfer **"INTER-BANK"**, and the success screen says **"Bank Name: eNaira"**, although eNaira is a digital-currency wallet, not a bank. | UX | **Consistency and standards** (Nielsen) and **trust** require the same information to appear the same way at every step. If the alias changes between confirmation and receipt, the user cannot tell which account actually received the money, and a dispute becomes harder (also an **Error prevention** concern). Reusing bank-transfer wording for an eNaira transfer breaks **Match between the system and the real world**: the labels describe the wrong kind of transaction. Fix: render all payee details from one source, and use eNaira-specific labels ("Wallet: eNaira", type "eNaira transfer"). |
 
 ---
 
@@ -85,6 +85,25 @@ Raw exports of every audited frame are in [`screenshots/`](screenshots/). Annota
 
 ### Issue 12 – Conflicting eNaira details
 ![Alias @adetor.1g on the success screen vs @adetoro.1g on the receipt](evidence/issue-12-alias-mismatch.png)
+
+---
+
+## 5. Summary and priorities
+
+**12 issues found:** 6 Accessibility, 2 UI, 4 UX.
+
+| Priority | Issues | Why first |
+|---|---|---|
+| **Fix before build** | 1, 3, 4, 11, 12 | They stop users from reading their balance or filling in the form, or they put money at risk (duplicate transfers, unclear amount, unclear payee). |
+| **High** | 5, 6, 8, 10 | They block or confuse screen-reader and motor-impaired users and make it harder to correct or verify a payment. |
+| **Medium** | 2, 7, 9 | Visual consistency and readability problems that erode trust and polish. |
+
+**Root causes and system-level fixes:**
+
+- **Opacity used instead of colour tokens** (issues 4, 5): define text colour tokens that already pass contrast, and never fade text or icons with layer opacity.
+- **No single component for primary buttons and list rows** (issues 2, 7): build one `Button / Primary` and one `ListItem` component with fixed spacing.
+- **No accessibility annotations in the handoff** (issues 3, 10): add an annotation layer with accessible names, focus order and loading or live-region states before developer handoff.
+- **Content not driven by one data source** (issues 8, 11, 12): show the same payee name, alias and formatted amount, from the same data, on every screen of the flow.
 
 ---
 
