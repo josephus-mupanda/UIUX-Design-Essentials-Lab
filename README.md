@@ -17,6 +17,7 @@ A "Shift Left" review of the SwiftPay **Send Money** flow. The Figma mock-up was
 |---|---|
 | [`UX-Accessibility Design Audit.md`](UX-Accessibility%20Design%20Audit.md) | Lab brief, instructions and grading rubric |
 | [`SwiftPay-Design-Audit-Report.md`](SwiftPay-Design-Audit-Report.md) | The audit report |
+| [`SwiftPay-Design-Audit-Report.docx`](SwiftPay-Design-Audit-Report.docx) | The same report in the Word "Audit Report Template" format, for submission |
 | [`evidence/`](evidence/) | One annotated image per issue (red boxes mark the problem) |
 | [`screenshots/`](screenshots/) | Unmodified exports of the audited Figma frames |
 
